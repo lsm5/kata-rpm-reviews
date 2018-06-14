@@ -1,86 +1,66 @@
-%global PREFIX /usr/
-%global BINDIR %{PREFIX}/bin
-%global DOMAIN github.com
-%global ORG kata-containers
-%global PROJECT proxy
-%global IMPORTNAME %{DOMAIN}/%{ORG}/%{PROJECT}
-%global GO_VERSION 1.10.2
+%global with_debug 1
 
-%if 0%{?suse_version}
-%define LIBEXECDIR %{_libdir}
+%define gobuild(o:) go build -tags="$BUILDTAGS rpm_crashtraceback" -ldflags "${LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n')" -a -v -x %{?**};
+
+%global provider github
+%global provider_tld com
+%global project kata-containers
+%global repo proxy
+%global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
+%global git0 https://%{import_path}
+%global commit0 a69326b63802952b14203ea9c1533d4edb8c1d64
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+
+%if 0%{with_debug}
+%global _find_debuginfo_dwz_opts %{nil}
+%global _dwz_low_mem_die_limit 0
 %else
-%define LIBEXECDIR %{_libexecdir}
-%endif
+%global debug_package %{nil}
+%endif # with_debug
 
-%undefine _missing_build_ids_terminate_build
-Name:      kata-proxy
-Version:   1.0.0+git.a69326b
-Release:   29.1
-Source0:   %{name}-%{version}.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: pkgconfig(systemd)
+Name: kata-%{repo}
+Version: 1.0.0
+Release: 1.git%{shortcommit0}%{?dist}
+ExclusiveArch: aarch64 %{arm} ppc64le s390x x86_64
+URL: %{git0}
+Source0: %{git0}/archive/%{commit0}/%{repo}-%{shortcommit0}.tar.gz
+BuildRequires: %{?go_compiler:compiler(go-compiler)}%{!?go_compiler:golang}
 BuildRequires: git
-Summary  : No detailed summary available
-Group    : Development/Tools
-License  : Apache-2.0
-
-Requires: kata-proxy-bin
-
-#!BuildIgnore: post-build-checks
-
-# Patches
-#Patches
-
+Buildrequires: make
+BuildRequires: systemd
+Summary: Kata proxy
+License: ASL 2.0
 
 %description
-.. contents::
-.. sectnum::
-``kata-proxy``
-===================
-Overview
---------
-
-%global debug_package %{nil}
-%define _unpackaged_files_terminate_build 0
-
-%package bin
-Summary: bin components for the kata-proxy package.
-Group: Binaries
-
-%description bin
-bin components for the kata-proxy package.
+%{summary}
 
 %prep
-mkdir local
-tar -C local -xzf ../SOURCES/go%{GO_VERSION}.linux-amd64.tar.gz
-
-%setup -q
-
-# Patches
-#Apply patches
-
+%autosetup -Sgit -n %{repo}-%{commit0}
 
 %build
-export GOROOT=$HOME/rpmbuild/BUILD/local/go
-export PATH=$PATH:$HOME/rpmbuild/BUILD/local/go/bin
-export GOPATH=$HOME/rpmbuild/BUILD/go/
+mkdir _build
+pushd _build
+mkdir -p src/%{provider}.%{provider_tld}/%{project}
+ln -s $(dirs +1 -l) src/%{import_path}
+popd
 
-mkdir -p $HOME/rpmbuild/BUILD/go/src/%{DOMAIN}/%{ORG}
-ln -s %{_builddir}/%{name}-%{version} $HOME/rpmbuild/BUILD/go/src/%{IMPORTNAME}
-cd $HOME/rpmbuild/BUILD/go/src/%{IMPORTNAME}
-make
-
-%clean
-echo "Clean build root"
-rm -rf %{buildroot}
+mv vendor src
+export GOPATH=$(pwd)/_build:$(pwd):%{gopath}
+GOPATH=$GOPATH %gobuild -o bin/%{name} %{import_path}
 
 %install
-make install LIBEXECDIR=%{buildroot}%{LIBEXECDIR}
+# install binaries
+install -dp %{buildroot}%{_libexecdir}/kata-containers
+install -p -m 755 bin/%{name} %{buildroot}%{_libexecdir}/kata-containers
+
+%clean
 
 %files
-%defattr(-,root,root,-)
+%license LICENSE
+%doc CODE_OF_CONDUCT.md CONTRIBUTING.md README.md
+%dir %{_libexecdir}/kata-containers
+%{_libexecdir}/kata-containers/%{name}
 
-%files bin
-%defattr(-,root,root,-)
-%{LIBEXECDIR}/kata-containers
-%{LIBEXECDIR}/kata-containers/kata-proxy
+%changelog
+* Thu Jun 14 2018 Lokesh Mandvekar <lsm5@fedoraproject.org> - 1.0.0-1.gita69326b
+- first build (ready for Fedora review)
