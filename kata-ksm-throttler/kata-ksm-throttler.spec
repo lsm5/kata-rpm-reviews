@@ -7,8 +7,8 @@
 %global project kata-containers
 %global repo ksm-throttler
 %global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
-%global commit0 aa4d33da7f6dc962e7fa67eee655f152a16c4bea
 %global git0 https://%{import_path}
+%global commit0 aa4d33da7f6dc962e7fa67eee655f152a16c4bea
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %if 0%{with_debug}
@@ -20,7 +20,7 @@
 
 Name: kata-%{repo}
 Version: 1.0.0
-Release: 1.git%{shortcommit0}%{?dist}
+Release: 2.git%{shortcommit0}%{?dist}
 ExclusiveArch: x86_64
 URL: %{git0}
 Source0: %{git0}/archive/%{commit0}/%{repo}-%{shortcommit0}.tar.gz
@@ -68,6 +68,17 @@ install -p -m 755 bin/vc %{buildroot}%{_libexecdir}/%{repo}/trigger/virtcontaine
 install -dp %{buildroot}%{_unitdir}
 install -p -m 644 %{repo}.service.in %{buildroot}%{_unitdir}/%{repo}.service
 install -p -m 644 vc-throttler.service.in %{buildroot}%{_unitdir}/vc-throttler.service
+
+%check
+
+%post
+%systemd_post vc-throttler
+
+%preun
+%systemd_preun vc-throttler
+
+%postun
+%systemd_postun_with_restart vc-throttler
 
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}
