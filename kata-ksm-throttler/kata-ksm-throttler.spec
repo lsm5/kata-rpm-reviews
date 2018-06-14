@@ -95,5 +95,8 @@ install -p -m 644 vc-throttler.service.in %{buildroot}%{_unitdir}/vc-throttler.s
 %{_unitdir}/vc-throttler.service
 
 %changelog
+* Thu Jun 14 2018 Lokesh Mandvekar <lsm5@fedoraproject.org> - 1.0.0-2.gitaa4d33d
+- include scriptlets
+
 * Thu Jun 14 2018 Lokesh Mandvekar <lsm5@fedoraproject.org> - 1.0.0-1.gitaa4d33d
 - first build (ready for Fedora review)
