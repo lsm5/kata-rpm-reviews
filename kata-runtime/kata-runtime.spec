@@ -1,7 +1,6 @@
 %global with_debug 1
 
-%define gobuild(o:) go build -tags="$BUILDTAGS rpm_crashtraceback" -ldflags "${LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n')" -a -v -x %{?**
-};
+%define gobuild(o:) go build -tags="$BUILDTAGS rpm_crashtraceback" -ldflags "${LDFLAGS:-} -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n')" -a -v -x %{?**};
 
 %global provider github
 %global provider_tld com
@@ -9,7 +8,7 @@
 %global repo runtime
 %global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
 %global git0 https://%{import_path}
-%global commit0 42821b7c0a572bb6b1497e6a2b9a3ad6301c09bb
+%global commit0 fca7eb822d29380502f38296b71b6e969253c4ee
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %if 0%{with_debug}
@@ -32,9 +31,9 @@ BuildRequires: git
 BuildRequires: make
 Requires: kata-containers-image >= 1.0.0-29
 Requires: kata-linux-container >= 4.14.22.1-130
-Requires: kata-proxy >= 1.0.0+git.a69326b-29
-Requires: kata-shim >= 1.0.0+git.74cbc1e-30
-Requires: kata-ksm-throttler >= 1.0.0+git.422c7f7-29
+Requires: kata-proxy >= 1.0.0-1
+Requires: kata-shim >= 1.0.0-1
+Requires: kata-ksm-throttler >= 1.0.0-2
 Requires: qemu-lite >= 2.11.0-43
 Requires: qemu-vanilla >= 2.11-41
 
