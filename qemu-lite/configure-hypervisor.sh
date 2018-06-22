@@ -304,7 +304,7 @@ main()
 	fi
 
 	# Not required as "-uuid ..." is always passed to the qemu binary
-	qemu_options+=(size:--disable-uuid)
+	#qemu_options+=(size:--disable-uuid)
 
 	# Disable debug
 	qemu_options+=(size:--disable-debug-tcg)
