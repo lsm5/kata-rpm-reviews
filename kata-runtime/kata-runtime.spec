@@ -35,7 +35,7 @@ Requires: kata-proxy >= 1.0.0-1
 Requires: kata-shim >= 1.0.0-1
 Requires: kata-ksm-throttler >= 1.0.0-2
 Requires: qemu-lite >= 2.11.0-43
-Requires: qemu-vanilla >= 2.11-41
+Requires: qemu
 
 %description
 

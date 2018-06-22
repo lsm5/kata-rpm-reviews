@@ -8,9 +8,10 @@ Name: qemu-lite
 Version: 2.11.0
 Release: 1.git%{shortcommit0}%{?dist}
 URL: %{git0}
+ExclusiveArch: x86_64
 #Source0: %%{git0}/archive/%%{commit0}/qemu-%%{shortcommit0}.tar.gz
 Source0: qemu-lite-2.11.0+git.6ba2bfbee9.tar.gz
-Source2: configure-hypervisor.sh
+Source1: configure-hypervisor.sh
 Patch1: 0001-memfd-fix-configure-test.patch
 Summary: OpenBIOS development utilities
 License: GPLv2 & BSD
@@ -24,6 +25,7 @@ BuildRequires: glib2-devel
 BuildRequires: libattr-devel
 BuildRequires: libcap-devel
 BuildRequires: libcap-ng-devel
+BuildRequires: librbd-devel
 BuildRequires: libtool
 BuildRequires: libtool-ltdl-devel
 BuildRequires: m4
@@ -56,7 +58,7 @@ data components for the qemu-lite package.
 
 %prep
 %autosetup -Sgit -n qemu-lite-2.11.0+git.6ba2bfbee9
-cp %{SOURCE2} .
+cp %{SOURCE1} .
 chmod +x configure-hypervisor.sh
 
 %build
