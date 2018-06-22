@@ -1,5 +1,5 @@
 #%%global qemu_lite_hash 6ba2bfbee9
-%global commit0 3d5d319e1221082974711af1d09d82f0755c1698
+%global commit0 6ba2bfbee9a80bfd03605c5eb2ca743c8b68389e
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global git0 https://github.com/kata-containers/qemu
 
@@ -17,6 +17,7 @@ Requires: qemu-lite-bin
 Requires: qemu-lite-data
 BuildRequires: automake
 BuildRequires: bison
+BuildRequires: capstone-devel
 BuildRequires: flex
 BuildRequires: gcc-c++
 BuildRequires: glib2-devel
@@ -180,5 +181,5 @@ done
 %{_datadir}%{name}/qemu/skiboot.lid
 
 %changelog
-* Thu Jun 21 2018 Lokesh Mandvekar <lsm5@fedoraproject.org> - 2.11.1.git3d5d319
-- built 3d5d319
+* Thu Jun 21 2018 Lokesh Mandvekar <lsm5@fedoraproject.org> - 2.11.1.git6ba2bfb
+- built 6ba2bfb
