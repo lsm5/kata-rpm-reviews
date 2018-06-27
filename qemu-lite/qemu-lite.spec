@@ -15,7 +15,7 @@
 Name: qemu-lite
 Version: 2.11.0
 Release: 1.git%{shortcommit_qemu}%{?dist}
-URL: %{git0}
+URL: %{git_qemu}
 ExclusiveArch: x86_64
 Source0: %{git_qemu}/archive/%{commit_qemu}/qemu-%{shortcommit_qemu}.tar.gz
 #Source0: qemu-lite-2.11.0+git.6ba2bfbee9.tar.gz
@@ -24,7 +24,7 @@ Source2: %{git_keycode}/archive/%{commit_keycode}/keycodemapdb-%{shortcommit_key
 Source3: configure-hypervisor.sh
 Patch1: 0001-memfd-fix-configure-test.patch
 Summary: OpenBIOS development utilities
-License: GPLv2 & BSD
+License: GPLv2
 BuildRequires: automake
 BuildRequires: bison
 BuildRequires: capstone-devel
@@ -76,11 +76,11 @@ tar zxf %{SOURCE2}
 mv keycodemapdb-%{commit_keycode}/* ui/keycodemapdb
 
 cp %{SOURCE3} .
-chmod +x configure-hypervisor.sh
+#chmod +x configure-hypervisor.sh
 
 %build
 export LANG=C
-"./configure-hypervisor.sh" "%{name}" \
+bash "./configure-hypervisor.sh" "%{name}" \
 	| xargs ./configure --prefix=%{_prefix} \
     --python=%{__python2} \
     --libdir=%{_libdir}/kata-%{name}
