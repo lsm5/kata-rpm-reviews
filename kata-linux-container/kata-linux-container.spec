@@ -4,70 +4,44 @@
 # This specialization allows us to optimize memory footprint and boot time.
 #
 
-%define bzimage_arch x86
+%global bzimage_arch x86
+%global kversion %{version}-%{release}.container
 
-Name:           kata-linux-container
-Version:        4.14.22.1
-Release:        130.1
-License:        GPL-2.0
-Summary:        The Linux kernel optimized for running inside a container
-Url:            http://www.kernel.org/
-Group:          kernel
-Source0:        https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.14.22.tar.xz
-Source1:        config
-
-%define kversion %{version}-%{release}.container
-
-BuildRequires:  bash >= 2.03
-BuildRequires:  bc
-BuildRequires:  binutils-devel
-
-%if 0%{?rhel_version}
-BuildRequires:  elfutils-devel
-%endif
-
-%if 0%{?suse_version}
-BuildRequires:  libelf-devel
-%endif
-
-%if 0%{?fedora} || 0%{?centos_version}
-BuildRequires:  pkgconfig(libelf)
-%endif
-
-BuildRequires:  make >= 3.78
-BuildRequires:  openssl-devel
-BuildRequires:  flex
-BuildRequires:  bison
+Name: kata-linux-container
+Version: 4.14.22.1
+Release: 1
+License: GPL-2.0
+Summary: The Linux kernel optimized for running inside a container
+URL: http://www.kernel.org/
+Group: kernel
+Source0: https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.14.22.tar.xz
+Source1: config
+Patch1: 0001-NO-UPSTREAM-9P-always-use-cached-inode-to-fill-in-v9.patch
+BuildRequires: bc
+BuildRequires: binutils-devel
+BuildRequires: pkgconfig(libelf)
+BuildRequires: make
+BuildRequires: openssl-devel
+BuildRequires: flex
+BuildRequires: bison
 
 # don't strip .ko files!
 %global __os_install_post %{nil}
-%define debug_package %{nil}
-%define __strip /bin/true
-
-# Patches
-#Patches
-Patch001: 0001-NO-UPSTREAM-9P-always-use-cached-inode-to-fill-in-v9.patch
-
+%global debug_package %{nil}
+%global __strip /bin/true
 
 %description
-The Linux kernel.
+%{summary}
 
 %package debug
-Summary: Debug components for the kata-linux-container package.
-Group: Default
+Summary: Debug components for the kata-linux-container package
 
 %description debug
 Debug components for the kata-linux-container package.
 This package includes the kernel config and the kernel map.
 
 %prep
-%setup -q -n linux-4.14.22
-
-# Patches
-#Apply patches
-%patch001 -p1
-
-
+%autosetup -Sgit -n linux-4.14.22
 cp %{SOURCE1} .
 
 %build
@@ -81,11 +55,9 @@ BuildKernel() {
     make -s mrproper
     cp config .config
 
-    %if 0%{?fedora}
     #Fedora uses gcc 8, build is failing due to warnings.
     export CFLAGS="-Wno-error=restrict"	 
     export EXTRA_CFLAGS="-Wno-format-truncation -Wno-cast-function-type -Wno-error=restrict -Wno-error"
-    %endif
 
     make -s ARCH=$Arch oldconfig > /dev/null
     make -s CONFIG_DEBUG_SECTION_MISMATCH=y %{?_smp_mflags} ARCH=$Arch %{?sparse_mflags} || exit 1
@@ -101,7 +73,7 @@ InstallKernel() {
 
     Arch=%{_arch}
     KernelVer=%{kversion}
-    KernelDir=%{buildroot}/usr/share/kata-containers
+    KernelDir=%{buildroot}%{_datadir}/kata-containers
 
     mkdir   -p ${KernelDir}
 
@@ -125,13 +97,13 @@ InstallKernel arch/%{bzimage_arch}/boot/bzImage vmlinux
 rm -rf %{buildroot}/usr/lib/firmware
 
 %files
-%dir /usr/share/kata-containers
-/usr/share/kata-containers/vmlinux-%{kversion}
-/usr/share/kata-containers/vmlinux.container
-/usr/share/kata-containers/vmlinuz-%{kversion}
-/usr/share/kata-containers/vmlinuz.container
+%dir %{_datadir}/kata-containers
+%{_datadir}/kata-containers/vmlinux-%{kversion}
+%{_datadir}/kata-containers/vmlinux.container
+%{_datadir}/kata-containers/vmlinuz-%{kversion}
+%{_datadir}/kata-containers/vmlinuz.container
 
 %files debug
 %defattr(-,root,root,-)
-/usr/share/kata-containers/config-%{kversion}
-/usr/share/kata-containers/System.map-%{kversion}
+%{_datadir}/kata-containers/config-%{kversion}
+%{_datadir}/kata-containers/System.map-%{kversion}
