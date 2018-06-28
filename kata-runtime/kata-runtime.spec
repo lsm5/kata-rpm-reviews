@@ -29,7 +29,7 @@ License: ASL 2.0
 BuildRequires: %{?go_compiler:compiler(go-compiler)}%{!?go_compiler:golang}
 BuildRequires: git
 BuildRequires: make
-Requires: kata-containers-image >= 1.0.0-29
+Requires: kata-containers-image >= 1.0.0-1
 Requires: kata-linux-container >= 4.14.22.1-130
 Requires: kata-proxy >= 1.0.0-1
 Requires: kata-shim >= 1.0.0-1
