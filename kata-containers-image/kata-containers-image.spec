@@ -17,6 +17,7 @@
 Name: kata-containers-image
 Version: 1.0.0
 Release: 1.git%{shortcommit0}%{?dist}
+ExclusiveArch: %{ix86} x86_64
 License: ASL 2.0
 Summary: Kata Containers Image
 URL: %{git0}
